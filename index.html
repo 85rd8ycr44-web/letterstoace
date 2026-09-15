@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>happy birthday</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Courier+Prime:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --coffee: #3e2a20;
+    --coffee-deep: #2a1c15;
+    --clay: #8a5a3f;
+    --paper: #f4e9db;
+    --paper-dark: #e8d9c4;
+    --blush: #e8b9b3;
+    --blush-deep: #d99a94;
+    --ink: #3a2b22;
+  }
+
+  *{ box-sizing:border-box; }
+
+  html,body{
+    margin:0;
+    padding:0;
+    height:100%;
+    background: var(--coffee-deep);
+    overflow:hidden;
+  }
+
+  body{
+    font-family:'Courier Prime', monospace;
+    color: var(--ink);
+  }
+
+  /* ---------- envelope / cover screen ---------- */
+  #cover{
+    position:fixed;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:
+      radial-gradient(circle at 30% 20%, rgba(232,185,179,0.12), transparent 55%),
+      radial-gradient(circle at 75% 80%, rgba(138,90,63,0.18), transparent 50%),
+      var(--coffee-deep);
+    cursor:pointer;
+    z-index:10;
+    transition: opacity 0.9s ease, visibility 0.9s ease;
+  }
+
+  #cover.hidden{
+    opacity:0;
+    visibility:hidden;
+    pointer-events:none;
+  }
+
+  .envelope{
+    position:relative;
+    width:min(280px, 70vw);
+    aspect-ratio: 3 / 2;
+    background: var(--paper);
+    border-radius:3px;
+    box-shadow: 0 20px 45px rgba(0,0,0,0.45);
+  }
+
+  .envelope::before{
+    /* top flap */
+    content:"";
+    position:absolute;
+    top:0; left:0; right:0;
+    height:0;
+    border-left: calc(min(280px, 70vw) / 2) solid transparent;
+    border-right: calc(min(280px, 70vw) / 2) solid transparent;
+    border-top: calc(min(280px, 70vw) * 0.36) solid var(--paper-dark);
+  }
+
+  .envelope .seal{
+    position:absolute;
+    left:50%; top:38%;
+    transform: translate(-50%,-50%);
+    width:46px; height:46px;
+    border-radius:50%;
+    background: var(--blush-deep);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:var(--paper);
+    font-size:20px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.35);
+    z-index:2;
+  }
+
+  .cover-label{
+    position:absolute;
+    bottom:-46px;
+    left:0; right:0;
+    text-align:center;
+    color: var(--blush);
+    font-family:'Special Elite', monospace;
+    font-size:0.85rem;
+    letter-spacing:0.04em;
+    animation: pulse 2.2s ease-in-out infinite;
+  }
+
+  @keyframes pulse{
+    0%, 100% { opacity:0.55; }
+    50% { opacity:1; }
+  }
+
+  /* ---------- letter screen ---------- */
+  #letter-wrap{
+    position:fixed;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding: 6vh 5vw;
+    background-color: var(--coffee-deep);
+    background-image:
+      linear-gradient(rgba(232,185,179,0.10) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(232,185,179,0.10) 1px, transparent 1px),
+      radial-gradient(ellipse at top, #4a3527, var(--coffee-deep) 70%);
+    background-size: 34px 34px, 34px 34px, 100% 100%;
+  }
+
+  .page{
+    position:relative;
+    width:min(560px, 100%);
+    max-height:88vh;
+    overflow-y:auto;
+    background: var(--paper);
+    padding: 44px 38px 40px;
+    border-radius:2px;
+    box-shadow:
+      0 30px 60px rgba(0,0,0,0.5),
+      0 0 0 1px rgba(58,43,34,0.06);
+    background-image:
+      linear-gradient(var(--paper-dark) 1px, transparent 1px);
+    background-size: 100% 2.1em;
+    background-attachment:local;
+  }
+
+  .page::-webkit-scrollbar{ width:6px; }
+  .page::-webkit-scrollbar-thumb{ background: var(--paper-dark); border-radius:4px; }
+
+  .dateline{
+    font-family:'Special Elite', monospace;
+    font-size:0.8rem;
+    color: var(--clay);
+    letter-spacing:0.03em;
+    margin:0 0 22px;
+  }
+
+  #typed{
+    font-family:'Special Elite', monospace;
+    font-size: clamp(0.95rem, 2.6vw, 1.08rem);
+    line-height:2.1em;
+    color: var(--ink);
+    white-space:pre-wrap;
+  }
+
+  .cursor{
+    display:inline-block;
+    width:8px;
+    background: var(--blush-deep);
+    margin-left:1px;
+    animation: blink 0.9s steps(1) infinite;
+  }
+
+  @keyframes blink{
+    50% { opacity:0; }
+  }
+
+  .signoff{
+    margin-top:28px;
+    opacity:0;
+    transition: opacity 1.2s ease;
+    font-family:'Special Elite', monospace;
+    color: var(--clay);
+    font-size:0.95rem;
+  }
+
+  .signoff.show{ opacity:1; }
+
+  /* ---------- music control ---------- */
+  #music-toggle{
+    position:fixed;
+    bottom:22px;
+    right:22px;
+    width:46px;
+    height:46px;
+    border-radius:50%;
+    border:none;
+    background: var(--blush-deep);
+    color:var(--paper);
+    font-size:1.1rem;
+    cursor:pointer;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.35);
+    z-index:20;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transition: transform 0.2s ease, opacity 0.6s ease;
+    opacity:0;
+  }
+
+  #music-toggle.show{ opacity:1; }
+  #music-toggle:active{ transform: scale(0.92); }
+
+  .bars{
+    display:flex;
+    align-items:flex-end;
+    gap:2px;
+    height:14px;
+  }
+  .bars span{
+    display:block;
+    width:2.5px;
+    background: var(--paper);
+    border-radius:1px;
+    animation: eq 0.9s ease-in-out infinite;
+  }
+  .bars span:nth-child(1){ height:40%; animation-delay:0s; }
+  .bars span:nth-child(2){ height:100%; animation-delay:0.2s; }
+  .bars span:nth-child(3){ height:65%; animation-delay:0.4s; }
+  .bars span:nth-child(4){ height:85%; animation-delay:0.1s; }
+
+  @keyframes eq{
+    0%, 100% { transform: scaleY(0.4); }
+    50% { transform: scaleY(1); }
+  }
+
+  .paused .bars span{ animation-play-state: paused; transform: scaleY(0.4); }
+
+  @media (prefers-reduced-motion: reduce){
+    .cover-label, .bars span, .cursor{ animation:none; }
+  }
+</style>
+</head>
+<body>
+
+  <div id="cover">
+    <div class="envelope">
+      <div class="seal">&hearts;</div>
+      <div class="cover-label">tap to open</div>
+    </div>
+  </div>
+
+  <div id="letter-wrap">
+    <div class="page">
+      <p class="dateline" id="dateline"></p>
+      <div id="typed"></div>
+      <p class="signoff" id="signoff">— with love, always</p>
+    </div>
+  </div>
+
+  <button id="music-toggle" aria-label="play or pause music">
+    <div class="bars"><span></span><span></span><span></span><span></span></div>
+  </button>
+
+  <!--
+    Spotify no longer supports reliably hotlinking their 30-second preview
+    clips from outside their own app, so this points to a local audio file
+    instead. Add your own file named "song.mp3" in the same folder as this
+    index.html (or change the filename below to match yours).
+  -->
+  <audio id="bg-audio" loop preload="auto">
+    <source src="song.mp3" type="audio/mpeg">
+  </audio>
+
+  <script>
+    const message = `Happy birthday!
+
+I hope today feels exactly the way a birthday should — a little slower, a little sweeter, and full of the people who love you best (that's me, obviously).
+
+I don't say this often enough, but I'm really grateful for you. For the way you show up, the way you listen, the way you make ordinary days feel less ordinary just by being in them. Knowing you has made my life better in more ways than I can fit on this page.
+
+So here's to another year of your beautiful, chaotic, wonderful self — more laughter, more good food, more late nights talking about nothing and everything. I can't wait to see what this year brings you.
+
+Go do something today that makes you feel completely, unapologetically happy. You deserve it.`;
+
+    const dateline = document.getElementById('dateline');
+    const now = new Date();
+    dateline.textContent = now.toLocaleDateString(undefined, { year:'numeric', month:'long', day:'numeric' });
+
+    const typedEl = document.getElementById('typed');
+    const signoff = document.getElementById('signoff');
+    const cover = document.getElementById('cover');
+    const audio = document.getElementById('bg-audio');
+    const musicBtn = document.getElementById('music-toggle');
+
+    let typing = false;
+
+    function startTyping(){
+      if (typing) return;
+      typing = true;
+
+      let i = 0;
+      const cursor = document.createElement('span');
+      cursor.className = 'cursor';
+      cursor.innerHTML = '&nbsp;';
+      const page = document.querySelector('.page');
+
+      function tick(){
+        if (i < message.length){
+          typedEl.textContent = message.slice(0, i + 1);
+          typedEl.appendChild(cursor);
+          i++;
+
+          // keep the newest text in view as it's typed
+          cursor.scrollIntoView({ block: 'nearest' });
+
+          const prevCh = message[i - 2]; // char just before the one we typed
+          const ch = message[i - 1];     // char we just typed
+
+          // base pace, slowed to 50% of the original speed (double the delay)
+          let delay = 64;
+
+          // letters continuing the same word type faster: 75% of original speed
+          const isMidWord = prevCh && !/\s/.test(prevCh) && !/\s/.test(ch);
+          if (isMidWord) delay = 43;
+
+          // extra pauses after punctuation, scaled to match the slower base pace
+          if (ch === ',') delay = 320;
+          if (ch === '.' || ch === '!') delay = 760;
+          if (ch === '\n') delay = 840;
+
+          setTimeout(tick, delay);
+        } else {
+          cursor.remove();
+          signoff.classList.add('show');
+        }
+      }
+      tick();
+    }
+
+    function openLetter(){
+      cover.classList.add('hidden');
+      startTyping();
+
+      audio.play().then(() => {
+        musicBtn.classList.remove('paused');
+      }).catch(() => {
+        musicBtn.classList.add('paused');
+      });
+      musicBtn.classList.add('show');
+    }
+
+    cover.addEventListener('click', openLetter);
+
+    musicBtn.addEventListener('click', () => {
+      if (audio.paused){
+        audio.play();
+        musicBtn.classList.remove('paused');
+      } else {
+        audio.pause();
+        musicBtn.classList.add('paused');
+      }
+    });
+  </script>
+
+</body>
+</html>
