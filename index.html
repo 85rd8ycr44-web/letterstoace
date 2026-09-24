@@ -311,6 +311,8 @@
         } else {
           cursor.remove();
           signoff.classList.add('show');
+          signoff.scrollIntoView({ block: 'end', behavior: 'smooth' });
+
         }
       }
       tick();
