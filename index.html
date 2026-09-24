@@ -330,11 +330,25 @@ Go do something today that makes you feel completely, unapologetically happy. Yo
       tick();
     }
 
+    function fadeInAudio(el, targetVolume = 1, duration = 3000, step = 50){
+      el.volume = 0;
+      const steps = duration / step;
+      const increment = targetVolume / steps;
+      let count = 0;
+
+      const fade = setInterval(() => {
+        count++;
+        el.volume = Math.min(increment * count, targetVolume);
+        if (count >= steps) clearInterval(fade);
+      }, step);
+    }
+
     function openLetter(){
       cover.classList.add('hidden');
       startTyping();
 
       audio.play().then(() => {
+        fadeInAudio(audio, 1, 3000); // fades to full volume over 3s
         musicBtn.classList.remove('paused');
       }).catch(() => {
         musicBtn.classList.add('paused');
@@ -347,6 +361,7 @@ Go do something today that makes you feel completely, unapologetically happy. Yo
     musicBtn.addEventListener('click', () => {
       if (audio.paused){
         audio.play();
+        fadeInAudio(audio, 1, 1500); // slightly quicker fade for manual resume
         musicBtn.classList.remove('paused');
       } else {
         audio.pause();
